@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo vé máy bay giả</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+    <!-- Nhúng thư viện html2canvas để chụp ảnh vé -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- PHẦN NHẬP LIỆU -->
+        <section class="form-section">
+            <h1>✈️ Tạo vé máy bay giả</h1>
+            <p class="subtitle">Tùy chỉnh thông tin bên dưới, sau đó tải ảnh về máy.</p>
+
+            <form id="ticketForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="airline">Hãng hàng không</label>
+                        <input type="text" id="airline" placeholder="Sorry Airlines" value="Sorry Airlines">
+                        <div id="airlineError" class="error-message" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="brandColor">🎨 Màu thương hiệu</label>
+                        <div class="color-picker-row">
+                            <input type="color" id="brandColor" value="#00ff00">
+                            <span class="color-hint">&lt; Chọn màu hãng</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="passengerName">Tên hành khách</label>
+                        <input type="text" id="passengerName" placeholder="NGUYEN VAN A" value="NGUYEN VAN A">
+                    </div>
+                    <div class="form-group">
+                        <label for="flightNumber">Số hiệu chuyến bay</label>
+                        <input type="text" id="flightNumber" placeholder="SA123" value="SA123">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fromCode">Mã sân bay đi</label>
+                        <input type="text" id="fromCode" placeholder="SGN" value="SGN" maxlength="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="fromCity">Thành phố đi</label>
+                        <input type="text" id="fromCity" placeholder="Ho Chi Minh" value="Ho Chi Minh">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="toCode">Mã sân bay đến</label>
+                        <input type="text" id="toCode" placeholder="HAN" value="HAN" maxlength="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="toCity">Thành phố đến</label>
+                        <input type="text" id="toCity" placeholder="Ha Noi" value="Ha Noi">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="departureTime">Giờ khởi hành</label>
+                        <input type="time" id="departureTime" value="08:30">
+                    </div>
+                    <div class="form-group">
+                        <label for="arrivalTime">Giờ đến</label>
+                        <input type="time" id="arrivalTime" value="10:45">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">Ngày bay</label>
+                        <input type="date" id="date" value="2026-06-15">
+                    </div>
+                    <div class="form-group">
+                        <label for="seat">Số ghế</label>
+                        <input type="text" id="seat" placeholder="12A" value="12A">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gate">Cửa ra máy bay</label>
+                        <input type="text" id="gate" placeholder="A12" value="A12">
+                    </div>
+                    <div class="form-group">
+                        <label for="class">Hạng vé</label>
+                        <select id="class">
+                            <option value="Economy">Economy</option>
+                            <option value="Business">Business</option>
+                            <option value="First Class">First Class</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pnr">Mã đặt chỗ (PNR)</label>
+                    <input type="text" id="pnr" placeholder="ABC123" value="ABC123" maxlength="6">
+                </div>
+            </form>
+
+            <div class="action-buttons">
+                <button type="button" id="updateBtn" class="btn btn-primary">🔄 Cập nhật vé</button>
+                <button type="button" id="downloadBtn" class="btn btn-success">⬇️ Tải ảnh về máy</button>
+            </div>
+        </section>
+
+        <!-- PHẦN HIỂN THỊ VÉ -->
+        <section class="ticket-section">
+            <div id="ticketPreview" class="ticket">
+                <div class="ticket-header">
+                    <div class="airline-logo">
+                        <span class="plane-icon">✈</span>
+                        <span id="ticketAirline">Sorry Airlines</span>
+                    </div>
+                    <div class="ticket-type">BOARDING PASS</div>
+                </div>
+
+                <div class="ticket-body">
+                    <div class="route">
+                        <div class="airport">
+                            <span class="airport-code" id="ticketFromCode">SGN</span>
+                            <span class="airport-city" id="ticketFromCity">Ho Chi Minh</span>
+                            <span class="airport-time" id="ticketDepTime">08:30</span>
+                        </div>
+                        <div class="flight-path">
+                            <span class="path-line"></span>
+                            <span class="plane-marker">✈</span>
+                            <span class="path-line"></span>
+                        </div>
+                        <div class="airport">
+                            <span class="airport-code" id="ticketToCode">HAN</span>
+                            <span class="airport-city" id="ticketToCity">Ha Noi</span>
+                            <span class="airport-time" id="ticketArrTime">10:45</span>
+                        </div>
+                    </div>
+
+                    <div class="ticket-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Hành khách</span>
+                            <span class="detail-value" id="ticketPassenger">NGUYEN VAN A</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Chuyến bay</span>
+                            <span class="detail-value" id="ticketFlight">SA123</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Ngày</span>
+                            <span class="detail-value" id="ticketDate">15/06/2026</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Ghế</span>
+                            <span class="detail-value" id="ticketSeat">12A</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Cửa</span>
+                            <span class="detail-value" id="ticketGate">A12</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Hạng</span>
+                            <span class="detail-value" id="ticketClass">Economy</span>
+                        </div>
+                    </div>
+
+                    <div class="ticket-footer">
+                        <div class="barcode">
+                            <span></span><span></span><span></span><span></span><span></span>
+                            <span></span><span></span><span></span><span></span><span></span>
+                            <span></span><span></span><span></span><span></span><span></span>
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <div class="pnr">
+                            <span class="pnr-label">PNR</span>
+                            <span class="pnr-value" id="ticketPNR">ABC123</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DÒNG BẮT BUỘC Ở CUỐI VÉ -->
+                <div class="ticket-disclaimer">
+                    Ảnh fake được tạo tại www.sieu.io.vn/j4f/fake-air-ticket<br>
+                    Tên hãng hàng không là không có thật, không có tính pháp lý.<br>
+                    Người dùng tự chịu trách nhiệm khi tạo và dùng ảnh này.
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
